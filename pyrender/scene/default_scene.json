@@ -1,0 +1,45 @@
+{
+    "cameras": [
+        {
+            "location": [2.5, 1.5, 3.0],
+            "look_at_point": [0.0, 0.0, 0.0],
+            "up_direction": [0.0, 1.0, 0.0],
+            "near_plane": 0.01,
+            "far_plane": 1000000.0
+        }
+    ],
+    "lights": [
+        {
+            "location": [2.5, 1.5, 3.0],
+            "ambient_color": [1.0, 1.0, 1.0, 1.0],
+            "diffuse_color": [1.0, 1.0, 1.0, 1.0],
+            "specular_color": [1.0, 1.0, 1.0, 1.0]
+        },
+        {
+            "location": [-4.0, -1.0, 1.0],
+            "ambient_color": [1.0, 1.0, 1.0, 1.0],
+            "diffuse_color": [1.0, 1.0, 1.0, 1.0],
+            "specular_color": [1.0, 1.0, 1.0, 1.0]
+        },
+        {
+            "location": [4.0, 0.0, -1.0],
+            "ambient_color": [1.0, 1.0, 1.0, 1.0],
+            "diffuse_color": [1.0, 1.0, 1.0, 1.0],
+            "specular_color": [1.0, 1.0, 1.0, 1.0]
+        }
+    ],
+    "views": [
+        {
+            "type": "mesh_only",
+            "mesh": "",
+            "transform": [1.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0,  0.0, 0.0, 0.0],
+            "name": "renderer_output.png",
+            "width": 800,
+            "height": 600,
+            "with_quarter": false,
+            "with_axis": false,
+            "transparent_bg": false,
+            "background": "d"
+        }
+    ]
+}

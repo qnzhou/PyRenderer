@@ -1,0 +1,23 @@
+<scene version="0.5.0">
+    <shape type="shapegroup" id="quarter">
+        <shape type="cylinder">
+            <point name="p0" x="0" y="-0.875" z="0"/>
+            <point name="p1" x="0" y="0.875" z="0"/>
+            <float name="radius" value="12.13"/>
+        </shape>
+        <shape type="disk">
+            <transform name="toWorld">
+                <scale value="12.13"/>
+                <rotate x="1" angle="90"/>
+                <translate y="-0.875"/>
+            </transform>
+        </shape>
+        <shape type="disk">
+            <transform name="toWorld">
+                <scale value="12.13"/>
+                <rotate x="1" angle="-90"/>
+                <translate y="0.875"/>
+            </transform>
+        </shape>
+    </shape>
+</scene>

@@ -1,0 +1,11 @@
+#declare grass = <137,180,166>/255;
+#declare velvet = <26,70,105>/255;
+#declare plastic = <193,173,138>/255;
+#declare nylon_white = <255,254,235>/255;
+#declare dark_bg_color = <51, 46, 48>/255;
+#declare light_bg_color = <1,1,1>;
+#declare sandstone = <191, 181, 123>/255;
+#declare light_red = <232, 87, 93>/255;
+#declare light_blue = <119, 189, 217>/255;
+#declare light_yellow = <203, 255, 121>/255;
+#declare light_green = <96, 191, 108>/255;
