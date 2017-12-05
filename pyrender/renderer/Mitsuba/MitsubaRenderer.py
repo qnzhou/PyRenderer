@@ -12,7 +12,7 @@ from mitsuba.render import Scene, RenderQueue, RenderJob, SceneHandler
 
 from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 from pyrender.renderer.AbstractRenderer import AbstractRenderer
-import PyMesh
+import pymesh
 
 class MitsubaRenderer(AbstractRenderer):
     def __init__(self, scene):
@@ -453,15 +453,7 @@ class MitsubaRenderer(AbstractRenderer):
         colors = active_view.vertex_colors.reshape((len(vertices),-1), order="C");
         colors *= 255;
 
-        factory = PyMesh.MeshFactory();
-        factory.load_data(
-                vertices.ravel(order="C"),
-                faces.ravel(order="C"),
-                np.array([]),
-                vertices.shape[1],
-                faces.shape[1],
-                0);
-        mesh = factory.create();
+        mesh = pymesh.form_mesh(vertices, faces);
         mesh.add_attribute("red");
         mesh.set_attribute("red", colors[:,0].ravel());
         mesh.add_attribute("green");
@@ -469,13 +461,8 @@ class MitsubaRenderer(AbstractRenderer):
         mesh.add_attribute("blue");
         mesh.set_attribute("blue", colors[:,2].ravel());
 
-        writer = PyMesh.MeshWriter.create_writer(tmp_mesh_name);
-        writer.with_attribute("red");
-        writer.with_attribute("green");
-        writer.with_attribute("blue");
-        writer.use_float(); # Mitsuba does not like .ply with double.
-        writer.write_mesh(mesh);
-
+        pymesh.save_mesh(tmp_mesh_name, mesh,
+                "red", "green", "blue", ascii=True, use_float=True, anonymous=True);
         return tmp_mesh_name;
 
     def __get_normalize_transform(self):
