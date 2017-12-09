@@ -4,8 +4,7 @@ import random
 from .View import View
 from .ViewDecorator import ViewDecorator
 from pyrender.color.ColorMap import ColorMap
-
-from PyMeshUtils import convert_to_face_attribute_from_name
+import pymesh
 
 class ScalarView(ViewDecorator):
     @classmethod
@@ -97,7 +96,7 @@ class ScalarView(ViewDecorator):
         elif field_size == num_faces:
             field = np.repeat(field, self.mesh.vertex_per_face);
         elif field_size == num_voxels:
-            field = convert_to_face_attribute_from_name(self.mesh.raw_mesh,
+            field = pymesh.convert_to_face_attribute_from_name(self.mesh.raw_mesh,
                     self.scalar_field_name);
             field = np.repeat(field, self.mesh.vertex_per_face);
         else:

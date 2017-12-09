@@ -6,6 +6,7 @@ import os.path
 import sys
 
 from pyrender.scene.Scene import Scene
+from pyrender.scene.ClippedView import ClippedView
 
 def render_with_opengl(scene):
     from pyrender.renderer.OpenGL.GUIFrontEnd import GUIFrontEnd
@@ -50,6 +51,9 @@ def update_scene_with_arguments(scene, args):
             view.with_wire_frame = True;
         view.with_quarter = args.with_quarter;
         view.with_axis = args.with_axis;
+
+    if args.clip is not None:
+        scene.views[0] = ClippedView(scene.views[0], args.clip);
     scene.set_orientation(
             up_dir = args.up_direction,
             front_dir = args.front_direction,
@@ -95,6 +99,8 @@ def parse_arguments():
             help="min and max bound for scalar field", default=None);
     parser.add_argument("--normalize", action="store_true",
             help="normalize scalar field by area/volume");
+    parser.add_argument("--clip", default=None,
+            help="clip mesh", choices=["+X", "+Y", "+Z", "-X", "-Y", "-Z"]);
     args = parser.parse_args();
     return args;
 

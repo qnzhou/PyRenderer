@@ -447,11 +447,10 @@ class MitsubaRenderer(AbstractRenderer):
         dim = vertices.shape[1];
         num_faces, vertex_per_face = faces.shape;
         vertices = vertices[faces.ravel(order="C")];
+        colors = active_view.vertex_colors[faces.ravel(order="C")];
+        colors *= 255;
         faces = np.arange(len(vertices), dtype=int).reshape(
                 (num_faces, vertex_per_face), order="C");
-
-        colors = active_view.vertex_colors.reshape((len(vertices),-1), order="C");
-        colors *= 255;
 
         mesh = pymesh.form_mesh(vertices, faces);
         mesh.add_attribute("red");
