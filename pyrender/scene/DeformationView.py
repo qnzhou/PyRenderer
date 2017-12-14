@@ -4,7 +4,7 @@ from .View import View
 from .ViewDecorator import ViewDecorator
 from pyrender.color.ColorMap import ColorMap
 
-from PyMeshUtils import convert_to_face_attribute_from_name
+import pymesh
 
 class DeformationView(ViewDecorator):
     @classmethod

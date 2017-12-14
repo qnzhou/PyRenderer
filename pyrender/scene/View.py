@@ -36,6 +36,9 @@ class View(object):
         elif view_type == "clipped":
             from .ClippedView import ClippedView
             instance = ClippedView.create_from_setting(setting);
+        elif view_type == "wire_network":
+            from .WireView import WireView
+            instance = WireView.create_from_setting(setting);
         else:
             raise NotImplementedError(
                     "View type {} is not supported.".format(view_type));
@@ -112,7 +115,14 @@ class View(object):
 
     @property
     def with_wire_frame(self):
-        return False;
+        if hasattr(self, "__with_wire_frame"):
+            return self.__with_wire_frame;
+        else:
+            return False;
+
+    @with_wire_frame.setter
+    def with_wire_frame(self, val):
+        self.__with_wire_frame = val;
 
     @property
     def with_alpha(self):

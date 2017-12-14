@@ -75,19 +75,46 @@ class CompositeView(View):
             vtx = vtx.T;
 
             vertices.append(vtx);
-            faces.append(view.faces + num_vertices);
-            voxels.append(view.voxels + num_vertices);
-            vertex_normals.append(view.vertex_normals);
-            face_normals.append(view.face_normals);
-            vertex_colors.append(view.vertex_colors);
+            if len(view.faces) > 0:
+                faces.append(view.faces + num_vertices);
+            if len(view.voxels) > 0:
+                voxels.append(view.voxels + num_vertices);
+            if len(view.vertex_normals) > 0:
+                vertex_normals.append(view.vertex_normals);
+            if len(view.face_normals) > 0:
+                face_normals.append(view.face_normals);
+            if len(view.vertex_colors) > 0:
+                vertex_colors.append(view.vertex_colors);
             num_vertices += len(vtx);
 
-        self.__vertices = np.vstack(vertices);
-        self.__faces = np.vstack(faces);
-        self.__voxels = np.vstack(voxels);
-        self.__vertex_normals = np.vstack(vertex_normals);
-        self.__face_normals = np.vstack(face_normals);
-        self.__vertex_colors = np.vstack(vertex_colors);
+        if len(vertices) > 0:
+            self.__vertices = np.vstack(vertices);
+        else:
+            self.__vertices = np.zeros((0, 3));
+        if len(faces) > 0:
+            self.__faces = np.vstack(faces);
+        else:
+            self.__faces = np.zeros((0, 3));
+        if len(voxels) > 0:
+            self.__voxels = np.vstack(voxels);
+        else:
+            self.__voxels = np.zeros((0, 4));
+        if len(vertex_normals) > 0:
+            self.__vertex_normals = np.vstack(vertex_normals);
+        else:
+            self.__vertex_normals = np.zeros((0, 3, 3));
+        if len(face_normals) > 0:
+            self.__face_normals = np.vstack(face_normals);
+        else:
+            self.__face_normals = np.zeros((0, 3));
+        if len(vertex_colors) > 0:
+            self.__vertex_colors = np.vstack(vertex_colors);
+        else:
+            self.__vertex_colors = np.zeros((0, 3, 4));
+        self.primitives = sum([view.primitives for view in self.views], []);
+
+        self.with_wire_frame = np.any([view.with_wire_frame for view in
+            self.views]);
 
     def __fit_into_unit_sphere(self, diagonal_len=2.0):
         self.bmin = np.amin(self.vertices, axis=0);
@@ -126,3 +153,4 @@ class CompositeView(View):
     @property
     def with_alpha(self):
         return np.any([v.with_alpha for v in self.views]);
+
