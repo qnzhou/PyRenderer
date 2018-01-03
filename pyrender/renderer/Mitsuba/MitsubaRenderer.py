@@ -19,14 +19,23 @@ class MitsubaRenderer(AbstractRenderer):
         super(MitsubaRenderer, self).__init__(scene);
 
     def render(self):
+        print(1)
         self.__initialize();
+        print(2)
         self.__add_integrator();
+        print(3)
         self.__add_lights();
+        print(4)
         self.__add_active_camera();
+        print(5)
         self.__add_active_view();
+        print(6)
         self.__add_primitives();
+        print(7)
         self.__add_others();
+        print(8)
         self.__run_mitsuba();
+        print(9)
 
     def __initialize(self):
         self.__initialize_mitsuba_setting();
@@ -451,9 +460,6 @@ class MitsubaRenderer(AbstractRenderer):
         colors *= 255;
         faces = np.arange(len(vertices), dtype=int).reshape(
                 (num_faces, vertex_per_face), order="C");
-        print(active_view.vertex_colors.shape);
-        print(vertices.shape);
-        print(colors.shape);
 
         mesh = pymesh.form_mesh(vertices, faces);
         mesh.add_attribute("red");
