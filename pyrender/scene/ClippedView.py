@@ -41,14 +41,15 @@ class ClippedView(ViewDecorator):
         else:
             raise NotImplementedError("Unknown plane type: {}".format(plane));
 
-        v_to_keep = np.array([should_keep(v) for v in self.view.vertices]);
         if len(self.view.voxels) > 0:
-            self.V_to_keep = np.all(v_to_keep[self.view.voxels], axis=1);
+            centroids = np.mean(self.view.vertices[self.view.voxels], axis=1);
+            self.V_to_keep = [should_keep(v) for v in centroids];
             voxels = self.view.voxels[self.V_to_keep];
             self.mesh = pymesh.form_mesh(self.view.vertices, np.array([]), voxels);
         else:
-            self.f_to_keep = np.all(v_to_keep[self.view.faces], axis=1);
-            faces = self.view.faces[self.f_to_keep];
+            centroids = np.mean(self.view.vertices[self.view.faces], axis=1);
+            self.V_to_keep = [should_keep(v) for v in centroids];
+            faces = self.view.faces[self.V_to_keep];
             self.mesh = pymesh.form_mesh(self.view.vertices, faces);
 
         self.mesh.add_attribute("face_normal");
