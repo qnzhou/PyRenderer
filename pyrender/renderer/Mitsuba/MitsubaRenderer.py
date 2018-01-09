@@ -5,6 +5,7 @@ from numpy.linalg import norm
 from math import atan2, degrees
 import os.path
 from collections import OrderedDict
+import datetime
 
 from mitsuba.core import PluginManager, Scheduler, Statistics, LocalWorker, Thread
 from mitsuba.core import Transform, Point, Vector, Matrix4x4, Spectrum, Color3
@@ -150,16 +151,23 @@ class MitsubaRenderer(AbstractRenderer):
         self.mitsuba_scene.addChild(mitsuba_camera);
 
     def __add_active_view(self):
-        active_view = self.scene.active_view;
+        self.__add_view(self.scene.active_view);
+
+    def __add_view(self, active_view):
+        if len(active_view.subviews) > 0:
+            for view in active_view.subviews:
+                self.__add_view(view);
+            return;
+
         if len(active_view.faces) == 0: return;
 
-        mesh_file = self.__save_temp_mesh();
-        normalize_transform = self.__get_normalize_transform();
-        view_transform = self.__get_view_transform();
+        mesh_file = self.__save_temp_mesh(active_view);
+        normalize_transform = self.__get_normalize_transform(active_view);
+        view_transform = self.__get_view_transform(active_view);
         glob_transform = self.__get_glob_transform();
 
         total_transform = glob_transform * normalize_transform * view_transform;
-        material_setting = self.__get_material_setting();
+        material_setting = self.__get_material_setting(active_view);
         setting = {
                 "type": "ply",
                 "filename": mesh_file,
@@ -171,9 +179,10 @@ class MitsubaRenderer(AbstractRenderer):
         self.mitsuba_scene.addChild(target_shape);
 
     def __add_primitives(self):
-        scale = self.scene.active_view.scale;
-        normalize_transform = self.__get_normalize_transform();
-        view_transform = self.__get_view_transform();
+        active_view = self.scene.active_view;
+        scale = active_view.scale;
+        normalize_transform = self.__get_normalize_transform(active_view);
+        view_transform = self.__get_view_transform(active_view);
         glob_transform = self.__get_glob_transform();
         total_transform = glob_transform * normalize_transform * view_transform;
 
@@ -253,8 +262,7 @@ class MitsubaRenderer(AbstractRenderer):
                 }
         return setting;
 
-    def __get_material_setting(self):
-        active_view = self.scene.active_view;
+    def __get_material_setting(self, active_view):
         setting = {};
         if self.with_wire_frame:
             diffuse_color = {
@@ -265,6 +273,8 @@ class MitsubaRenderer(AbstractRenderer):
             if self.with_uniform_colors:
                 diffuse_color["interiorColor"] =\
                         Spectrum(active_view.vertex_colors[0][0].tolist()[0:3]);
+            #elif self.with_colors:
+            #    diffuse_color["interiorColor"] = { "type": "vertexcolors" }
         else:
             if self.with_colors:
                 diffuse_color = { "type": "vertexcolors" }
@@ -434,12 +444,14 @@ class MitsubaRenderer(AbstractRenderer):
         print(Statistics.getInstance().getStats());
         scheduler.stop();
 
-    def __save_temp_mesh(self):
+    def __save_temp_mesh(self, active_view):
         basename, ext = os.path.splitext(self.image_name);
         path, name = os.path.split(basename);
-        tmp_mesh_name = os.path.join(self.output_dir, "{}_tmp.ply".format(name));
+        now = datetime.datetime.now()
+        stamp = now.isoformat();
+        tmp_mesh_name = os.path.join(self.output_dir, "{}_{}.ply".format(name,
+            stamp));
 
-        active_view = self.scene.active_view;
         vertices = active_view.vertices;
         faces = active_view.faces;
         voxels = active_view.voxels;
@@ -464,8 +476,7 @@ class MitsubaRenderer(AbstractRenderer):
                 "red", "green", "blue", ascii=True, use_float=True, anonymous=True);
         return tmp_mesh_name;
 
-    def __get_normalize_transform(self):
-        active_view = self.scene.active_view;
+    def __get_normalize_transform(self, active_view):
         centroid = active_view.center
         scale = active_view.scale
 
@@ -473,8 +484,7 @@ class MitsubaRenderer(AbstractRenderer):
                 Transform.translate(Vector(*(-1 * centroid)));
         return normalize_transform;
 
-    def __get_view_transform(self):
-        active_view = self.scene.active_view;
+    def __get_view_transform(self, active_view):
         transform = np.eye(4);
         transform[0:3, :] = active_view.transform.reshape((3, 4), order="F");
         view_transform = Transform(Matrix4x4(transform.ravel(order="C").tolist()));

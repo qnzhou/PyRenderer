@@ -150,3 +150,11 @@ class ViewDecorator(MeshView):
     def with_alpha(self):
         return self.view.with_alpha;
 
+    @property
+    def subviews(self):
+        return self.view.subviews;
+
+    @subviews.setter
+    def subviews(self, val):
+        self.view.subviews = val;
+

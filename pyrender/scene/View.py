@@ -76,6 +76,7 @@ class View(object):
         self.transform = np.copy(self.default_transform);
         self.alpha = 1.0;
         self.primitives = [];
+        self.subviews = [];
 
     def __validate_transform_field(self):
         if len(self.transform) != 12:
@@ -182,4 +183,12 @@ class View(object):
             self.__background = val;
         else:
             raise RuntimeError("Background \"{}\" is invalid".format(val));
+
+    @property
+    def subviews(self):
+        return self.__subviews;
+
+    @subviews.setter
+    def subviews(self, val):
+        self.__subviews = val;
 
