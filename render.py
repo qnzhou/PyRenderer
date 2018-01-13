@@ -116,6 +116,7 @@ def main():
         scene.output_dir = args.output;
     for i in range(len(scene.views)):
         scene.activate_view(i);
+        assert(scene.active_view == scene.views[i]);
 
         if args.renderer == "opengl":
             render_with_opengl(scene);

@@ -14,7 +14,7 @@ from pyrender.misc.json_utils import remove_unicode
 from pyrender.misc.quaternion import Quaternion
 from pyrender.misc.direction import direction_map
 
-class Scene:
+class Scene(object):
     @classmethod
     def create_from_file(cls, scene_file):
         instance = cls();
@@ -206,5 +206,9 @@ class Scene:
     @property
     def active_view(self):
         return self.views[self.__active_view_idx]
+
+    @active_view.setter
+    def active_view(self, val):
+        self.views[self.__active_view_idx] = val;
 
 

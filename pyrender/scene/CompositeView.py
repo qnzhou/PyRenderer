@@ -39,6 +39,7 @@ class CompositeView(View):
     def __init__(self, views):
         super(CompositeView, self).__init__();
         self.views = views;
+        self.subviews = views;
         self.unified_deformation_magnitude = None;
 
     def initialize_views(self):

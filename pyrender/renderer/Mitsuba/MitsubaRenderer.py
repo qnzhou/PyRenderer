@@ -161,6 +161,8 @@ class MitsubaRenderer(AbstractRenderer):
 
         if len(active_view.faces) == 0: return;
 
+        old_active_view = self.scene.active_view;
+        self.scene.active_view = active_view;
         mesh_file = self.__save_temp_mesh(active_view);
         normalize_transform = self.__get_normalize_transform(active_view);
         view_transform = self.__get_view_transform(active_view);
@@ -177,6 +179,7 @@ class MitsubaRenderer(AbstractRenderer):
         setting.update(material_setting);
         target_shape = self.plgr.create(setting);
         self.mitsuba_scene.addChild(target_shape);
+        self.scene.active_view = old_active_view;
 
     def __add_primitives(self):
         active_view = self.scene.active_view;
