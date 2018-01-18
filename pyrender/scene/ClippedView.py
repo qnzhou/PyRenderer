@@ -34,17 +34,17 @@ class ClippedView(ViewDecorator):
         bbox_min, bbox_max = self.mesh.bbox;
         center = (bbox_min + bbox_max) * 0.5;
         if plane == "+X":
-            should_keep = lambda(v) : v[0] > center[0];
+            should_keep = lambda v: v[0] > center[0];
         elif plane == "+Y":
-            should_keep = lambda(v) : v[1] > center[1];
+            should_keep = lambda v: v[1] > center[1];
         elif plane == "+Z":
-            should_keep = lambda(v) : v[2] > center[2];
+            should_keep = lambda v: v[2] > center[2];
         elif plane == "-X":
-            should_keep = lambda(v) : v[0] < center[0];
+            should_keep = lambda v: v[0] < center[0];
         elif plane == "-Y":
-            should_keep = lambda(v) : v[1] < center[1];
+            should_keep = lambda v: v[1] < center[1];
         elif plane == "-Z":
-            should_keep = lambda(v) : v[2] < center[2];
+            should_keep = lambda v: v[2] < center[2];
         else:
             raise NotImplementedError("Unknown plane type: {}".format(plane));
 
