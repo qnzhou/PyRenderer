@@ -39,6 +39,9 @@ class View(object):
         elif view_type == "wire_network":
             from .WireView import WireView
             instance = WireView.create_from_setting(setting);
+        elif view_type == "boundary":
+            from .BoundaryView import BoundaryView
+            instance = BoundaryView.create_from_setting(setting);
         else:
             raise NotImplementedError(
                     "View type {} is not supported.".format(view_type));
