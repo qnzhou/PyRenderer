@@ -17,6 +17,8 @@ class Camera(object):
                 instance.up_direction);
         instance.near_plane = setting.get("near_plane", instance.near_plane);
         instance.far_plane = setting.get("far_plane", instance.far_plane);
+        instance.crop_center = setting.get("crop_center", instance.crop_center);
+        instance.crop_scale = setting.get("crop_scale", instance.crop_scale);
         instance.update();
         return instance;
 
@@ -32,6 +34,8 @@ class Camera(object):
         self.up_direction = [0.0, 1.0, 0.0];
         self.near_plane = 0.01
         self.far_plane = 1000000.0;
+        self.crop_center = [0.5, 0.5];
+        self.crop_scale = 1.0;
         self.update();
 
     def update(self):

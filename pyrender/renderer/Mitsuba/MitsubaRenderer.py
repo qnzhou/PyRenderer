@@ -125,6 +125,13 @@ class MitsubaRenderer(AbstractRenderer):
             pixel_format = "rgba";
         else:
             pixel_format = "rgb";
+
+        crop_offset_x = self.image_width * np.clip(camera.crop_center[0] - 0.5 *
+                camera.crop_scale, 0.0, 1.0 - camera.crop_scale);
+        crop_offset_y = self.image_height * np.clip(camera.crop_center[1] - 0.5 *
+                camera.crop_scale, 0.0, 1.0 - camera.crop_scale);
+        crop_width = self.image_width * camera.crop_scale;
+        crop_height = self.image_height * camera.crop_scale;
         mitsuba_camera = self.plgr.create({
             "type": "perspective",
             "fov": float(camera.fovy),
@@ -137,6 +144,10 @@ class MitsubaRenderer(AbstractRenderer):
                 "type": "ldrfilm",
                 "width": self.image_width,
                 "height": self.image_height,
+                "cropOffsetX": int(crop_offset_x),
+                "cropOffsetY": int(crop_offset_y),
+                "cropWidth": int(crop_width),
+                "cropHeight": int(crop_height),
                 "banner": False,
                 "pixelFormat": pixel_format,
                 "rfilter": {
@@ -149,6 +160,7 @@ class MitsubaRenderer(AbstractRenderer):
                 }
             });
         self.mitsuba_scene.addChild(mitsuba_camera);
+        print(mitsuba_camera);
 
     def __add_active_view(self):
         self.__add_view(self.scene.active_view);
