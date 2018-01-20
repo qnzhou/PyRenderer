@@ -126,12 +126,16 @@ class MitsubaRenderer(AbstractRenderer):
         else:
             pixel_format = "rgb";
 
-        crop_offset_x = self.image_width * np.clip(camera.crop_center[0] - 0.5 *
-                camera.crop_scale, 0.0, 1.0 - camera.crop_scale);
-        crop_offset_y = self.image_height * np.clip(camera.crop_center[1] - 0.5 *
-                camera.crop_scale, 0.0, 1.0 - camera.crop_scale);
-        crop_width = self.image_width * camera.crop_scale;
-        crop_height = self.image_height * camera.crop_scale;
+        crop_bbox = np.array(camera.crop_bbox);
+        if np.amax(crop_bbox) <= 1.0:
+            # bbox is relative.
+            crop_bbox[:,0] *= self.image_width;
+            crop_bbox[:,1] *= self.image_height;
+
+        assert(np.all(crop_bbox >= 0));
+        assert(np.all(crop_bbox[:,0] <= self.image_width));
+        assert(np.all(crop_bbox[:,1] <= self.image_height));
+
         mitsuba_camera = self.plgr.create({
             "type": "perspective",
             "fov": float(camera.fovy),
@@ -144,10 +148,10 @@ class MitsubaRenderer(AbstractRenderer):
                 "type": "ldrfilm",
                 "width": self.image_width,
                 "height": self.image_height,
-                "cropOffsetX": int(crop_offset_x),
-                "cropOffsetY": int(crop_offset_y),
-                "cropWidth": int(crop_width),
-                "cropHeight": int(crop_height),
+                "cropOffsetX": int(crop_bbox[0,0]),
+                "cropOffsetY": int(crop_bbox[0,1]),
+                "cropWidth": int(crop_bbox[1,0] - crop_bbox[0,0]),
+                "cropHeight": int(crop_bbox[1,1] - crop_bbox[0,1]),
                 "banner": False,
                 "pixelFormat": pixel_format,
                 "rfilter": {
