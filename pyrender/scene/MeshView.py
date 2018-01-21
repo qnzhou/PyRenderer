@@ -15,6 +15,7 @@ class MeshView(View):
             "mesh": mesh_file,
             "color": color_name,
             "wire_frame": bool,
+            "line_width": float, # default to 0.001
             "bbox": [[min_x, min_y, min_z], [max_x, max_y, max_z]]
         }
         """
@@ -22,6 +23,7 @@ class MeshView(View):
         instance = MeshView(mesh_file);
         instance.color_name = setting.get("color", None);
         instance.with_wire_frame = setting.get("wire_frame", False);
+        instance.line_width = setting.get("line_width", instance.line_width);
         if "bbox" in setting:
             instance.bmin = np.array(setting["bbox"][0]);
             instance.bmax = np.array(setting["bbox"][1]);

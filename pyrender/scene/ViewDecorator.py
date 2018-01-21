@@ -147,6 +147,14 @@ class ViewDecorator(MeshView):
         self.view.with_wire_frame = val;
 
     @property
+    def line_width(self):
+        return self.view.line_width;
+
+    @line_width.setter
+    def line_width(self, line_width):
+        self.view.line_width = line_width;
+
+    @property
     def with_alpha(self):
         return self.view.with_alpha;
 

@@ -286,7 +286,7 @@ class MitsubaRenderer(AbstractRenderer):
             diffuse_color = {
                     "type": "wireframe",
                     "edgeColor": Spectrum(0.0),
-                    "lineWidth": 0.001,
+                    "lineWidth": active_view.line_width,
                     };
             if self.with_uniform_colors:
                 diffuse_color["interiorColor"] =\

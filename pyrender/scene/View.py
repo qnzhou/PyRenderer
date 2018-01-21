@@ -80,6 +80,7 @@ class View(object):
         self.alpha = 1.0;
         self.primitives = [];
         self.subviews = [];
+        self.line_width = 0.001;
 
     def __validate_transform_field(self):
         if len(self.transform) != 12:
@@ -127,6 +128,14 @@ class View(object):
     @with_wire_frame.setter
     def with_wire_frame(self, val):
         self.__with_wire_frame = val;
+
+    @property
+    def line_width(self):
+        return self.__line_width;
+
+    @line_width.setter
+    def line_width(self, line_width):
+        self.__line_width = line_width;
 
     @property
     def with_alpha(self):
