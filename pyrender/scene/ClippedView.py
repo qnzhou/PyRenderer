@@ -25,10 +25,11 @@ class ClippedView(ViewDecorator):
         """
         nested_view = View.create_from_setting(setting["view"]);
         instance = ClippedView(nested_view, setting["plane"],
-                setting.get("interior_color", "light_blue"));
+                setting.get("interior_color", "blue"),
+                setting.get("exterior_color", "yellow"));
         return instance;
 
-    def __init__(self, nested_view, plane, interior_color):
+    def __init__(self, nested_view, plane, interior_color, exterior_color):
         super(ClippedView, self).__init__(nested_view);
         self.plane = plane;
         bbox_min, bbox_max = self.mesh.bbox;
@@ -93,14 +94,14 @@ class ClippedView(ViewDecorator):
                     MeshView.create_from_setting({
                         "type": "mesh_only",
                         "mesh": bd_mesh_file,
-                        "color": "yellow",
+                        "color": exterior_color,
                         "wire_frame": True,
                         "bbox": [self.bmin, self.bmax]
                         }),
                     MeshView.create_from_setting({
                         "type": "mesh_only",
                         "mesh": interface_mesh_file,
-                        "color": "blue",
+                        "color": interior_color,
                         "wire_frame": True,
                         "bbox": [self.bmin, self.bmax]
                         }),
