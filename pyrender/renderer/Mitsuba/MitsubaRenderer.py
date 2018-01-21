@@ -164,7 +164,6 @@ class MitsubaRenderer(AbstractRenderer):
                 }
             });
         self.mitsuba_scene.addChild(mitsuba_camera);
-        print(mitsuba_camera);
 
     def __add_active_view(self):
         self.__add_view(self.scene.active_view);
