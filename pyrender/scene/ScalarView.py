@@ -96,7 +96,7 @@ class ScalarView(ViewDecorator):
         elif field_size == num_faces:
             field = np.repeat(field, self.mesh.vertex_per_face);
         elif field_size == num_voxels:
-            field = pymesh.convert_to_face_attribute_from_name(self.mesh.raw_mesh,
+            field = pymesh.convert_to_face_attribute_from_name(self.mesh,
                     self.scalar_field_name);
             field = np.repeat(field, self.mesh.vertex_per_face);
         else:
