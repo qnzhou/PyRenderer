@@ -16,7 +16,8 @@ class ClippedView(ViewDecorator):
         """ syntax:
         {
             "type": "clipped",
-            "plane": +X,+Y,+Z,-X,-Y,-Z,
+            "plane": +X,+Y,+Z,-X,-Y,-Z, or [nx, ny, nz]
+            "cut_ratio": float between 0 and 1,
             "interior_color": "color_name"
             "view": {
                 ...
@@ -26,14 +27,16 @@ class ClippedView(ViewDecorator):
         nested_view = View.create_from_setting(setting["view"]);
         instance = ClippedView(nested_view, setting["plane"],
                 setting.get("interior_color", "blue"),
-                setting.get("exterior_color", "yellow"));
+                setting.get("exterior_color", "yellow"),
+                setting.get("cut_ratio", 0.5));
         return instance;
 
-    def __init__(self, nested_view, plane, interior_color, exterior_color):
+    def __init__(self, nested_view, plane, interior_color, exterior_color,
+            cut_ratio):
         super(ClippedView, self).__init__(nested_view);
         self.plane = plane;
         bbox_min, bbox_max = self.mesh.bbox;
-        center = (bbox_min + bbox_max) * 0.5;
+        center = bbox_min * cut_ratio + bbox_max * (1.0 - cut_ratio);
         if plane == "+X":
             should_keep = lambda v: v[0] > center[0];
         elif plane == "+Y":
@@ -46,6 +49,10 @@ class ClippedView(ViewDecorator):
             should_keep = lambda v: v[1] < center[1];
         elif plane == "-Z":
             should_keep = lambda v: v[2] < center[2];
+        elif isinstance(plane, list) and len(plane) == 4:
+            n = np.array(plane[:3]);
+            n = n / norm(n);
+            should_keep = lambda v: np.dot(v-center, n) < plane[3];
         else:
             raise NotImplementedError("Unknown plane type: {}".format(plane));
 
@@ -59,7 +66,7 @@ class ClippedView(ViewDecorator):
             self.V_to_keep = [should_keep(v) for v in centroids];
             voxels_to_keep = self.view.voxels[self.V_to_keep];
             voxel_face_id = voxel_face_id[self.V_to_keep];
-            self.mesh = pymesh.form_mesh(self.view.vertices, np.array([]), voxels_to_keep);
+            self.mesh = pymesh.form_mesh(self.view.vertices, np.zeros((0,3)), voxels_to_keep);
             self.mesh.add_attribute("voxel_face_index");
             new_voxel_face_id = self.mesh.get_voxel_attribute("voxel_face_index").astype(int);
 
