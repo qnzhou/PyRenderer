@@ -1,7 +1,7 @@
 from math import pi
 import numpy as np
 from numpy.linalg import norm
-import PyMesh
+import pymesh
 
 class Cluster:
     def __init__(self, points):
@@ -27,7 +27,7 @@ class Cluster:
     def __init_clusters(self):
         num_pts = len(self.points);
 
-        self.grid = PyMesh.HashGrid.create(self.radius);
+        self.grid = pymesh.HashGrid.create(self.radius, 3);
         self.grid.insert_multiple(np.arange(num_pts, dtype=int), self.points);
 
         self.seeds = [];

@@ -191,6 +191,13 @@ color_maps = {
                 0.7: hex2rgb("#abd9e9"),
                 0.9: hex2rgb("#2c7bb6"),
                 },
+        "BuYlRd": {
+                0.1: hex2rgb("#2c7bb6"),
+                0.3: hex2rgb("#abd9e9"),
+                0.5: hex2rgb("#ffffbf"),
+                0.7: hex2rgb("#fdae61"),
+                0.9: hex2rgb("#d7191c"),
+                },
         # The following color map are from the paper
         # http://www.sandia.gov/~kmorel/documents/ColorMaps/ColorMapsExpanded.pdf
         "cool_warm": {
