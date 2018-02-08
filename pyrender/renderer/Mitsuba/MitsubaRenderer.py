@@ -6,6 +6,7 @@ from math import atan2, degrees
 import os.path
 from collections import OrderedDict
 import datetime
+import tempfile
 
 from mitsuba.core import PluginManager, Scheduler, Statistics, LocalWorker, Thread
 from mitsuba.core import Transform, Point, Vector, Matrix4x4, Spectrum, Color3
@@ -467,7 +468,8 @@ class MitsubaRenderer(AbstractRenderer):
         path, name = os.path.split(basename);
         now = datetime.datetime.now()
         stamp = now.isoformat();
-        tmp_mesh_name = os.path.join(self.output_dir, "{}_{}.ply".format(name,
+        tmp_dir = tempfile.gettempdir();
+        tmp_mesh_name = os.path.join(tmp_dir, "{}_{}.ply".format(name,
             stamp));
 
         vertices = active_view.vertices;
