@@ -26,7 +26,7 @@ class MitsubaRenderer(AbstractRenderer):
         self.__add_lights();
         self.__add_active_camera();
         self.__add_active_view();
-        self.__add_primitives();
+        self.__add_active_primitives();
         self.__add_others();
         self.__run_mitsuba();
 
@@ -197,8 +197,17 @@ class MitsubaRenderer(AbstractRenderer):
         self.mitsuba_scene.addChild(target_shape);
         self.scene.active_view = old_active_view;
 
-    def __add_primitives(self):
-        active_view = self.scene.active_view;
+    def __add_active_primitives(self):
+        self.__add_primitives(self.scene.active_view);
+
+    def __add_primitives(self, active_view):
+        if len(active_view.subviews) > 0:
+            for view in active_view.subviews:
+                self.__add_primitives(view);
+            return;
+
+        old_active_view = self.scene.active_view;
+        self.scene.active_view = active_view;
         scale = active_view.scale;
         normalize_transform = self.__get_normalize_transform(active_view);
         view_transform = self.__get_view_transform(active_view);
@@ -235,6 +244,7 @@ class MitsubaRenderer(AbstractRenderer):
 
             mitsuba_primative = self.plgr.create(setting);
             self.mitsuba_scene.addChild(mitsuba_primative);
+        self.scene.active_view = old_active_view;
 
     def __add_sphere(self, shape):
         setting = {
