@@ -34,6 +34,10 @@ class Color(object):
     def __ne__(self, other):
         return not(self == other);
 
+    def __str__(self):
+        return "Color [{}, {}, {}, {}]".format(
+                self.color[0], self.color[1], self.color[2], self.color[3]);
+
     @property
     def red(self):
         return self.color[0];
