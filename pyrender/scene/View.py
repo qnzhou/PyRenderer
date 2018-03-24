@@ -205,7 +205,7 @@ class View(object):
         self.__subviews = val;
 
     @property
-    def center(self);
+    def center(self):
         return self.__center;
 
     @center.setter

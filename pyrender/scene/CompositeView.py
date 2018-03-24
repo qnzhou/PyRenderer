@@ -3,8 +3,6 @@ from numpy.linalg import norm
 from .View import View
 from pyrender.color.ColorMap import ColorMap
 
-from .DeformationView import DeformationView
-
 class CompositeView(View):
     @classmethod
     def create_from_setting(cls, setting):
@@ -30,16 +28,17 @@ class CompositeView(View):
                         "Subview of composite view must be a simple view!");
             views.append(view);
         instance = CompositeView(views);
-        instance.unified_deformation_magnitude =\
-                setting.get("unified_deform_magnitude",
-                        instance.unified_deformation_magnitude);
         return instance;
 
     def __init__(self, views):
         super(CompositeView, self).__init__();
         self.views = views;
         self.subviews = views;
-        self.unified_deformation_magnitude = None;
+        vertices = self.vertices;
+        self.bmin = np.amin(vertices, axis=0);
+        self.bmax = np.amax(vertices, axis=0);
+        self.center = 0.5 * (self.bmin + self.bmax);
+        self.scale = 2.0 / norm(self.bmax - self.bmin);
 
     @property
     def vertices(self):
