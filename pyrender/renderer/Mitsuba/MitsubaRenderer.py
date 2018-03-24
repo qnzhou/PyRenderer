@@ -81,13 +81,16 @@ class MitsubaRenderer(AbstractRenderer):
             self.global_transform = self.scene.global_transform;
 
     def __add_integrator(self):
-        integrator = self.plgr.create({
-            "type": "direct",
-            "shadingSamples": 16
-            #"type": "ao"
-            #"type": "volpath",
-            #"type": "path"
-            });
+        if self.with_alpha:
+            integrator = self.plgr.create({
+                "type": "volpath",
+                "rrDepth": 20
+                });
+        else:
+            integrator = self.plgr.create({
+                "type": "direct",
+                "shadingSamples": 16
+                });
         self.mitsuba_scene.addChild(integrator);
 
     def __add_lights(self):
@@ -221,6 +224,12 @@ class MitsubaRenderer(AbstractRenderer):
                     "type": "plastic",
                     "diffuseReflectance": Spectrum(shape.color[:3].tolist())
                     };
+            if shape.color[3] < 1.0:
+                color = {
+                        "type": "mask",
+                        "opacity": Spectrum(active_view.alpha),
+                        "bsdf": color
+                        };
             if isinstance(shape, Cylinder):
                 if shape.radius <= 0.0: continue;
                 setting = self.__add_cylinder(shape);
@@ -531,7 +540,7 @@ class MitsubaRenderer(AbstractRenderer):
 
     @property
     def with_alpha(self):
-        return self.scene.active_view.alpha != 1.0;
+        return self.scene.active_view.with_alpha;
 
     @property
     def with_wire_frame(self):

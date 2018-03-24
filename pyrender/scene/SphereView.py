@@ -4,7 +4,7 @@ from .View import View
 from .ViewDecorator import ViewDecorator
 from pyrender.primitives.Primitive import Sphere
 from pyrender.color.ColorMap import ColorMap
-from pyrender.misc.cluster import cluster
+#from pyrender.misc.cluster import cluster
 
 class SphereView(ViewDecorator):
     @classmethod
@@ -41,7 +41,8 @@ class SphereView(ViewDecorator):
 
         # hide actual mesh
         color = self.vertex_colors;
-        color[:,:,-1] = 0.0;
+        if len(color) > 0:
+            color[:,:,-1] = 0.0;
         self.vertex_colors = color;
 
         min_val = np.amin(self.scalar_field);
