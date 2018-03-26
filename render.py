@@ -79,8 +79,8 @@ def parse_arguments():
             action="store_true");
     parser.add_argument("--with-texture", "-t", help="draw texture",
             action="store_true");
-    parser.add_argument("--uv-scale", type=float, default=1.0);
-    parser.add_argument("--uv-offset", type=float, nargs=2, default=[0.0, 0.0]);
+    parser.add_argument("--uv-scale", type=float, default=100.0);
+    parser.add_argument("--uv-offset", type=float, nargs=2, default=[100.0, 100.0]);
     parser.add_argument("--background", "-B", help="background color",
             choices=["d", "l", "n"], default=None);
     parser.add_argument("--transparent-bg", help="use transparent background",
