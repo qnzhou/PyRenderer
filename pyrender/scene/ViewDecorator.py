@@ -159,10 +159,22 @@ class ViewDecorator(MeshView):
         return self.view.with_alpha;
 
     @property
+    def alpha(self):
+        return self.view.alpha;
+
+    @property
     def subviews(self):
         return self.view.subviews;
 
     @subviews.setter
     def subviews(self, val):
         self.view.subviews = val;
+
+    @property
+    def with_texture_coordinates(self):
+        return self.view.with_texture_coordinates;
+
+    @property
+    def texture_coordinates(self):
+        return self.view.texture_coordinates;
 

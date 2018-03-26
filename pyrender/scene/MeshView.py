@@ -112,3 +112,15 @@ class MeshView(View):
     @property
     def with_alpha(self):
         return self.alpha != 1.0;
+
+    @property
+    def with_texture_coordinates(self):
+        return False;
+
+    @property
+    def texture_coordinates(self):
+        if self.with_texture_coordinates:
+            return self.mesh.get_attribute("corner_texture");
+        else:
+            return np.array([]);
+

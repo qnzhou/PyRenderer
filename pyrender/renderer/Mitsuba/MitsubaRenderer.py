@@ -15,6 +15,7 @@ from mitsuba.render import Scene, RenderQueue, RenderJob, SceneHandler
 from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 from pyrender.renderer.AbstractRenderer import AbstractRenderer
 import pymesh
+from .serialization import serialize_mesh
 
 class MitsubaRenderer(AbstractRenderer):
     def __init__(self, scene):
@@ -164,7 +165,7 @@ class MitsubaRenderer(AbstractRenderer):
                 },
             "sampler": {
                 "type": "halton",
-                "sampleCount": 8
+                "sampleCount": 4,
                 }
             });
         self.mitsuba_scene.addChild(mitsuba_camera);
@@ -182,7 +183,7 @@ class MitsubaRenderer(AbstractRenderer):
 
         old_active_view = self.scene.active_view;
         self.scene.active_view = active_view;
-        mesh_file = self.__save_temp_mesh(active_view);
+        mesh_file, ext = self.__save_temp_mesh(active_view);
         normalize_transform = self.__get_normalize_transform(active_view);
         view_transform = self.__get_view_transform(active_view);
         glob_transform = self.__get_glob_transform();
@@ -190,7 +191,7 @@ class MitsubaRenderer(AbstractRenderer):
         total_transform = glob_transform * normalize_transform * view_transform;
         material_setting = self.__get_material_setting(active_view);
         setting = {
-                "type": "ply",
+                "type": ext[1:],
                 "filename": mesh_file,
                 "faceNormals": True,
                 "toWorld": total_transform
@@ -307,12 +308,16 @@ class MitsubaRenderer(AbstractRenderer):
                     "type": "wireframe",
                     "edgeColor": Spectrum(0.0),
                     "lineWidth": active_view.line_width,
+                    "interiorColor":
+                        Spectrum(active_view.vertex_colors[0][0].tolist()[0:3]),
                     };
-            if self.with_uniform_colors:
-                diffuse_color["interiorColor"] =\
-                        Spectrum(active_view.vertex_colors[0][0].tolist()[0:3]);
-            #elif self.with_colors:
-            #    diffuse_color["interiorColor"] = { "type": "vertexcolors" }
+        elif self.with_texture_coordinates:
+            diffuse_color = {
+                    "type": "checkerboard",
+                    "color0": Spectrum([1.0, 1.0, 1.0]),
+                    "color1": Spectrum([0.5, 0.5, 0.5]),
+                    "flipTexCoords": False,
+                    };
         else:
             if self.with_colors:
                 diffuse_color = { "type": "vertexcolors" }
@@ -323,7 +328,7 @@ class MitsubaRenderer(AbstractRenderer):
                 "type": "roughplastic",
                 "distribution": "beckmann",
                 "alpha": 0.2,
-                "diffuseReflectance": diffuse_color
+                "diffuseReflectance": diffuse_color,
                 };
         setting["bsdf"] = {
                 "type": "twosided",
@@ -335,13 +340,18 @@ class MitsubaRenderer(AbstractRenderer):
                     "opacity": Spectrum(active_view.alpha),
                     "bsdf": setting["bsdf"]
                     };
-        if not self.with_colors and not self.with_alpha and not self.with_wire_frame:
+        if not self.with_colors and \
+                not self.with_alpha and \
+                not self.with_wire_frame and \
+                not self.with_texture_coordinates:
             setting["subsurface"] = {
                     "type": "dipole",
                     "material": "Skimmilk",
                     "scale": 0.5
                     };
-        elif not self.with_alpha:
+        elif self.with_texture_coordinates:
+            setting["bsdf"]["bsdf"]["nonlinear"] = True;
+        elif not self.with_alpha and not self.with_texture_coordinates:
             setting["subsurface"] = {
                     "type": "dipole",
                     "material": "sprite",
@@ -488,8 +498,10 @@ class MitsubaRenderer(AbstractRenderer):
         now = datetime.datetime.now()
         stamp = now.isoformat();
         tmp_dir = tempfile.gettempdir();
-        tmp_mesh_name = os.path.join(tmp_dir, "{}_{}.ply".format(name,
-            stamp));
+        ext = ".serialized";
+
+        tmp_mesh_name = os.path.join(tmp_dir, "{}_{}{}".format(
+            name, stamp, ext));
 
         vertices = active_view.vertices;
         faces = active_view.faces;
@@ -499,21 +511,20 @@ class MitsubaRenderer(AbstractRenderer):
         num_faces, vertex_per_face = faces.shape;
         vertices = vertices[faces.ravel(order="C")];
         colors = active_view.vertex_colors.reshape((-1, 4), order="C");
-        colors *= 255;
         faces = np.arange(len(vertices), dtype=int).reshape(
                 (num_faces, vertex_per_face), order="C");
 
         mesh = pymesh.form_mesh(vertices, faces);
-        mesh.add_attribute("red");
-        mesh.set_attribute("red", colors[:,0].ravel());
-        mesh.add_attribute("green");
-        mesh.set_attribute("green", colors[:,1].ravel());
-        mesh.add_attribute("blue");
-        mesh.set_attribute("blue", colors[:,2].ravel());
 
-        pymesh.save_mesh(tmp_mesh_name, mesh,
-                "red", "green", "blue", ascii=True, use_float=True, anonymous=True);
-        return tmp_mesh_name;
+        if self.with_texture_coordinates:
+            uvs = active_view.texture_coordinates;
+        else:
+            uvs = None;
+
+        data = serialize_mesh(mesh, None, colors, uvs);
+        with open(tmp_mesh_name, 'wb') as fout:
+            fout.write(data);
+        return tmp_mesh_name, ext;
 
     def __get_normalize_transform(self, active_view):
         centroid = active_view.center
@@ -549,4 +560,8 @@ class MitsubaRenderer(AbstractRenderer):
     @property
     def with_uniform_colors(self):
         return self.scene.active_view.with_uniform_colors;
+
+    @property
+    def with_texture_coordinates(self):
+        return self.scene.active_view.with_texture_coordinates;
 

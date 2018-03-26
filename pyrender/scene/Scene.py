@@ -58,6 +58,21 @@ class Scene(object):
             setting["views"][0]["bounds"] = bounds;
         return cls.create_from_dict(setting);
 
+    @classmethod
+    def create_texture_scene(cls, mesh_file, uv_scale, uv_offset):
+        setting = {
+                "views": [{
+                    "type": "texture",
+                    "uv_scale": uv_scale,
+                    "uv_offset": uv_offset,
+                    "view": {
+                        "type": "mesh_only",
+                        "mesh": mesh_file
+                        }
+                    }]
+                };
+        return cls.create_from_dict(setting);
+
     def update_scene_from_file(self, scene_file):
         self.scene_file = scene_file;
         if scene_file is not None:

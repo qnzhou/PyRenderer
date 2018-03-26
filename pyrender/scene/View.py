@@ -42,6 +42,9 @@ class View(object):
         elif view_type == "boundary":
             from .BoundaryView import BoundaryView
             instance = BoundaryView.create_from_setting(setting);
+        elif view_type == "texture":
+            from .TextureView import TextureView
+            instance = TextureView.create_from_setting(setting);
         else:
             raise NotImplementedError(
                     "View type {} is not supported.".format(view_type));
@@ -211,4 +214,12 @@ class View(object):
     @center.setter
     def center(self, val):
         self.__center = val;
+
+    @property
+    def with_texture_coordinates(self):
+        return False;
+
+    @property
+    def texture_coordinates(self):
+        return np.array([]);
 

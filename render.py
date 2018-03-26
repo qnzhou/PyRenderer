@@ -25,7 +25,10 @@ def render_with_mitsuba(scene):
 def create_scene_from_arguments(args):
     assert(args.mesh is not None);
     path, name = os.path.split(args.mesh);
-    if args.scalar_field is None:
+    if args.with_texture:
+        scene = Scene.create_texture_scene(args.mesh,
+                args.uv_scale, args.uv_offset);
+    elif args.scalar_field is None:
         scene = Scene.create_basic_scene(args.mesh);
     else:
         scene = Scene.create_basic_scalar_scene(
@@ -74,6 +77,10 @@ def parse_arguments():
             action="store_true");
     parser.add_argument("--with-wire-frame", "-w", help="draw wire frame",
             action="store_true");
+    parser.add_argument("--with-texture", "-t", help="draw texture",
+            action="store_true");
+    parser.add_argument("--uv-scale", type=float, default=1.0);
+    parser.add_argument("--uv-offset", type=float, nargs=2, default=[0.0, 0.0]);
     parser.add_argument("--background", "-B", help="background color",
             choices=["d", "l", "n"], default=None);
     parser.add_argument("--transparent-bg", help="use transparent background",
