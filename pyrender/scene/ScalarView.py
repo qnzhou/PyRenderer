@@ -66,7 +66,7 @@ class ScalarView(ViewDecorator):
         if not self.mesh.has_attribute(self.scalar_field_name):
             raise RuntimeError("Scalar attribute {} does not exist!".format(
                 self.scalar_field_name));
-        field = self.mesh.get_attribute(self.scalar_field_name).ravel();
+        field = self.mesh.get_attribute(self.scalar_field_name).ravel().copy();
 
         if self.normalize:
             field = self.__normalize_scalar_field(field);

@@ -162,6 +162,10 @@ class ViewDecorator(MeshView):
     def alpha(self):
         return self.view.alpha;
 
+    @alpha.setter
+    def alpha(self, val):
+        self.view.alpha = val;
+
     @property
     def subviews(self):
         return self.view.subviews;
