@@ -37,7 +37,7 @@ class SphereView(ViewDecorator):
         assert(len(self.scalar_field) == len(self.base_points));
         assert(self.radius_range[1] > self.radius_range[0]);
 
-        self.__cluster_points();
+        #self.__cluster_points();
 
         # hide actual mesh
         color = self.vertex_colors;
@@ -50,7 +50,10 @@ class SphereView(ViewDecorator):
         radius_gap = self.radius_range[1] - self.radius_range[0];
         value_gap = max_val - min_val;
         for value, base in zip(self.scalar_field, self.base_points):
-            ratio = (value - min_val) / value_gap;
+            if value_gap > 0:
+                ratio = (value - min_val) / value_gap;
+            else:
+                ratio = 0.0;
             radius = self.radius_range[0] + ratio * radius_gap;
             if radius > 1e-6:
                 ball = Sphere(base, radius);

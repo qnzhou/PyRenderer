@@ -16,7 +16,8 @@ class ClippedView(ViewDecorator):
         """ syntax:
         {
             "type": "clipped",
-            "plane": +X,+Y,+Z,-X,-Y,-Z, or [nx, ny, nz]
+            "plane": +X,+Y,+Z,-X,-Y,-Z, or [nx, ny, nz, o]
+                s.t. the plane define is nx*x + ny*y + nz*z < o
             "cut_ratio": float between 0 and 1,
             "interior_color": "color_name"
             "view": {

@@ -264,6 +264,10 @@ color_maps = {
                 0.000: hex2rgb("#57B4E9"),
                 1.000: hex2rgb("#EFE442"),
                 },
+        "contrast_yr": {
+                0.000: hex2rgb("#EFE442"),
+                1.000: hex2rgb("#d7191c"),
+                },
         "binary": {
                 0.000: hex2rgb("#F28C58"),
                 1.000: hex2rgb("#EFE442"),
