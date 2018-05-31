@@ -7,7 +7,7 @@ class ViewDecorator(MeshView):
         self.view = view;
 
         # Deep copy all view properties.
-        self.transform = deepcopy(self.view.transform);
+        #self.transform = deepcopy(self.view.transform);
         self.background = deepcopy(self.view.background);
 
     def __getattr__(self, name):

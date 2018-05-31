@@ -60,8 +60,9 @@ class MitsubaRenderer(AbstractRenderer):
 
     def __initialize_geometry_setting(self):
         active_view = self.scene.active_view;
+        self.global_transform = self.scene.global_transform;
+        self.floor_height = None;
         if len(active_view.vertices) > 0:
-            self.global_transform = self.scene.global_transform;
             global_rotation = self.scene.global_transform[:3, :3];
 
             vertices = (active_view.vertices - active_view.center) * active_view.scale;
@@ -79,7 +80,6 @@ class MitsubaRenderer(AbstractRenderer):
             self.transformed_bbox_min = np.zeros(dim);
             self.transformed_bbox_max = np.ones(dim);
             self.floor_height = 0;
-            self.global_transform = self.scene.global_transform;
 
     def __add_integrator(self):
         if self.with_alpha:
@@ -173,10 +173,14 @@ class MitsubaRenderer(AbstractRenderer):
     def __add_active_view(self):
         self.__add_view(self.scene.active_view);
 
-    def __add_view(self, active_view):
+    def __add_view(self, active_view, parent_transform=None):
         if len(active_view.subviews) > 0:
             for view in active_view.subviews:
-                self.__add_view(view);
+                if parent_transform is None:
+                    view_transform = self.__get_view_transform(active_view);
+                else:
+                    view_transform = parent_transform * self.__get_view_transform(active_view);
+                self.__add_view(view, view_transform);
             return;
 
         if len(active_view.faces) == 0: return;
@@ -186,9 +190,11 @@ class MitsubaRenderer(AbstractRenderer):
         mesh_file, ext = self.__save_temp_mesh(active_view);
         normalize_transform = self.__get_normalize_transform(active_view);
         view_transform = self.__get_view_transform(active_view);
+        if parent_transform is not None:
+            view_transform = parent_transform * view_transform;
         glob_transform = self.__get_glob_transform();
 
-        total_transform = glob_transform * normalize_transform * view_transform;
+        total_transform = glob_transform * view_transform * normalize_transform;
         material_setting = self.__get_material_setting(active_view);
         setting = {
                 "type": ext[1:],
@@ -199,15 +205,51 @@ class MitsubaRenderer(AbstractRenderer):
         setting.update(material_setting);
         target_shape = self.plgr.create(setting);
         self.mitsuba_scene.addChild(target_shape);
+
+        M = (view_transform * normalize_transform).getMatrix();
+        M = np.array([
+            [   M[0, 0],
+                M[0, 1],
+                M[0, 2],
+                M[0, 3]],
+            [   M[1, 0],
+                M[1, 1],
+                M[1, 2],
+                M[1, 3]],
+            [   M[2, 0],
+                M[2, 1],
+                M[2, 2],
+                M[2, 3]],
+            [   M[3, 0],
+                M[3, 1],
+                M[3, 2],
+                M[3, 3]],
+            ]);
+        vertices = active_view.vertices;
+        vertices = np.hstack((vertices, np.ones((len(vertices), 1))));
+        vertices = np.dot(M, vertices.T).T
+        vertices = np.divide(vertices[:,0:3],
+                vertices[:,3][:,np.newaxis]);
+        self.transformed_bbox_min = np.amin(vertices, axis=0);
+        self.transformed_bbox_max = np.amax(vertices, axis=0);
+        center = 0.5 * (self.transformed_bbox_min + self.transformed_bbox_max);
+        floor_height = self.transformed_bbox_min[1] - center[1];
+        if self.floor_height is None or self.floor_height > floor_height:
+            self.floor_height = floor_height;
+
         self.scene.active_view = old_active_view;
 
     def __add_active_primitives(self):
         self.__add_primitives(self.scene.active_view);
 
-    def __add_primitives(self, active_view):
+    def __add_primitives(self, active_view, parent_transform=None):
         if len(active_view.subviews) > 0:
             for view in active_view.subviews:
-                self.__add_primitives(view);
+                if parent_transform is None:
+                    view_transform = self.__get_view_transform(active_view);
+                else:
+                    view_transform = parent_transform * self.__get_view_transform(active_view);
+                self.__add_primitives(view, view_transform);
             return;
 
         old_active_view = self.scene.active_view;
@@ -215,8 +257,10 @@ class MitsubaRenderer(AbstractRenderer):
         scale = active_view.scale;
         normalize_transform = self.__get_normalize_transform(active_view);
         view_transform = self.__get_view_transform(active_view);
+        if parent_transform is not None:
+            view_transform = parent_transform * view_transform;
         glob_transform = self.__get_glob_transform();
-        total_transform = glob_transform * normalize_transform * view_transform;
+        total_transform = glob_transform * view_transform * normalize_transform;
 
         primitives = self.scene.active_view.primitives;
         for shape in primitives:
