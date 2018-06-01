@@ -62,24 +62,10 @@ class MitsubaRenderer(AbstractRenderer):
         active_view = self.scene.active_view;
         self.global_transform = self.scene.global_transform;
         self.floor_height = None;
-        if len(active_view.vertices) > 0:
-            global_rotation = self.scene.global_transform[:3, :3];
-
-            vertices = (active_view.vertices - active_view.center) * active_view.scale;
-            vertices = np.dot(active_view.rotation, vertices.T) +\
-                    active_view.translation[:, np.newaxis];
-            vertices = np.dot(global_rotation, vertices);
-            vertices = vertices.T;
-            self.transformed_bbox_min = np.amin(vertices, axis=0);
-            self.transformed_bbox_max = np.amax(vertices, axis=0);
-
-            center = 0.5 * (self.transformed_bbox_min + self.transformed_bbox_max);
-            self.floor_height = self.transformed_bbox_min[1] - center[1];
-        else:
+        if len(active_view.vertices) == 0:
             dim = active_view.vertices.shape[1];
             self.transformed_bbox_min = np.zeros(dim);
             self.transformed_bbox_max = np.ones(dim);
-            self.floor_height = 0;
 
     def __add_integrator(self):
         if self.with_alpha:
@@ -206,7 +192,7 @@ class MitsubaRenderer(AbstractRenderer):
         target_shape = self.plgr.create(setting);
         self.mitsuba_scene.addChild(target_shape);
 
-        M = (view_transform * normalize_transform).getMatrix();
+        M = (glob_transform * view_transform * normalize_transform).getMatrix();
         M = np.array([
             [   M[0, 0],
                 M[0, 1],
@@ -232,8 +218,8 @@ class MitsubaRenderer(AbstractRenderer):
                 vertices[:,3][:,np.newaxis]);
         self.transformed_bbox_min = np.amin(vertices, axis=0);
         self.transformed_bbox_max = np.amax(vertices, axis=0);
-        center = 0.5 * (self.transformed_bbox_min + self.transformed_bbox_max);
-        floor_height = self.transformed_bbox_min[1] - center[1];
+        center = active_view.center;
+        floor_height = self.transformed_bbox_min[1];
         if self.floor_height is None or self.floor_height > floor_height:
             self.floor_height = floor_height;
 
