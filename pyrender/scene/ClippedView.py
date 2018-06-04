@@ -36,7 +36,8 @@ class ClippedView(ViewDecorator):
             cut_ratio):
         super(ClippedView, self).__init__(nested_view);
         self.plane = plane;
-        bbox_min, bbox_max = self.mesh.bbox;
+        bbox_min = self.view.bmin;
+        bbox_max = self.view.bmax;
         center = bbox_min * cut_ratio + bbox_max * (1.0 - cut_ratio);
         if plane == "+X":
             should_keep = lambda v: v[0] > center[0];
