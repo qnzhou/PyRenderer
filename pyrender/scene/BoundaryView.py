@@ -5,6 +5,7 @@ import pymesh
 import tempfile
 import datetime
 import os.path
+import logging
 
 class BoundaryView(View):
     @classmethod
@@ -22,7 +23,12 @@ class BoundaryView(View):
         bd_edges = mesh.boundary_edges;
         vertices, bd_edges, __ = pymesh.remove_isolated_vertices_raw(vertices, bd_edges);
         wires = pymesh.wires.WireNetwork();
-        wires.load(vertices, bd_edges);
+        if len(bd_edges) > 0:
+            wires.load(vertices, bd_edges);
+        else:
+            logger = logging.getLogger(__name__);
+            logger.warning("Mesh ({}) contains no boundary.".format(
+                setting["mesh"]));
 
         tmp_dir = tempfile.gettempdir();
         stamp = datetime.datetime.now().isoformat();
