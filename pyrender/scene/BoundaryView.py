@@ -20,6 +20,7 @@ class BoundaryView(View):
         mesh = pymesh.load_mesh(setting["mesh"]);
         vertices = mesh.vertices;
         bd_edges = mesh.boundary_edges;
+        vertices, bd_edges, __ = pymesh.remove_isolated_vertices_raw(vertices, bd_edges);
         wires = pymesh.wires.WireNetwork();
         wires.load(vertices, bd_edges);
 
@@ -33,6 +34,7 @@ class BoundaryView(View):
                 "wire_network": wire_file,
                 "color": setting.get("color", None),
                 "radius": setting.get("radius", 0.1),
+                "bbox": mesh.bbox,
                 };
         return WireView.create_from_setting(wire_setting);
 
