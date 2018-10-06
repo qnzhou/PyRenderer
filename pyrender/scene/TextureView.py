@@ -71,7 +71,9 @@ class TextureView(ViewDecorator):
         for e in bd_edges:
             v0 = vertices[e[0]];
             v1 = vertices[e[1]];
-            if numpy.linalg.norm(v0 - v1) <= 1e-12:
+            assert(np.all(np.isfinite(v0)));
+            assert(np.all(np.isfinite(v1)));
+            if numpy.linalg.norm(v0 - v1) <= radius:
                 continue;
             cylinder = Cylinder(v0, v1, radius);
             cylinder.color = color;
