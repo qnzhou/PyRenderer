@@ -61,7 +61,7 @@ class MitsubaRenderer(AbstractRenderer):
     def __initialize_geometry_setting(self):
         active_view = self.scene.active_view;
         self.global_transform = self.scene.global_transform;
-        self.floor_height = None;
+        self.floor_height = 1e-12;
         if len(active_view.vertices) == 0:
             dim = active_view.vertices.shape[1];
             self.transformed_bbox_min = np.zeros(dim);
@@ -536,11 +536,20 @@ class MitsubaRenderer(AbstractRenderer):
         vertices = active_view.vertices;
         faces = active_view.faces;
         voxels = active_view.voxels;
+        colors = active_view.vertex_colors.reshape((-1, 4), order="C");
 
         dim = vertices.shape[1];
         num_faces, vertex_per_face = faces.shape;
+        if vertex_per_face == 4:
+            faces = np.vstack([faces[:,[0,1,2]], faces[:,[0,2,3]]]);
+            vertex_per_face = 3;
+            num_faces *= 2;
+            colors = colors.reshape((-1, 4, 4), order="C");
+            colors = np.vstack([
+                colors[:,[0,1,2],:].reshape((-1, 4), order="C"),
+                colors[:,[0,2,3],:].reshape((-1, 4), order="C") ]);
         vertices = vertices[faces.ravel(order="C")];
-        colors = active_view.vertex_colors.reshape((-1, 4), order="C");
+        assert(len(colors) == len(vertices));
         faces = np.arange(len(vertices), dtype=int).reshape(
                 (num_faces, vertex_per_face), order="C");
 
