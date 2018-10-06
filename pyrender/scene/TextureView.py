@@ -54,9 +54,10 @@ class TextureView(ViewDecorator):
         vertices = self.mesh.vertices;
         faces = self.mesh.faces;
         uv = self.texture_coordinates;
-        assert(len(uv) == len(faces) * 3);
+        num_faces, vertex_per_face = faces.shape;
+        assert(len(uv) == num_faces * vertex_per_face);
 
-        uv_faces = np.arange(len(uv), dtype=int).reshape((-1, 3));
+        uv_faces = np.arange(len(uv), dtype=int).reshape((-1, vertex_per_face));
         mesh = pymesh.form_mesh(uv, uv_faces);
         mesh, info = pymesh.remove_duplicated_vertices(mesh);
         index_map = info["index_map"];

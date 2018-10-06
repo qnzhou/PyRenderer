@@ -537,6 +537,10 @@ class MitsubaRenderer(AbstractRenderer):
         faces = active_view.faces;
         voxels = active_view.voxels;
         colors = active_view.vertex_colors.reshape((-1, 4), order="C");
+        if self.with_texture_coordinates:
+            uvs = active_view.texture_coordinates;
+        else:
+            uvs = None;
 
         dim = vertices.shape[1];
         num_faces, vertex_per_face = faces.shape;
@@ -548,17 +552,17 @@ class MitsubaRenderer(AbstractRenderer):
             colors = np.vstack([
                 colors[:,[0,1,2],:].reshape((-1, 4), order="C"),
                 colors[:,[0,2,3],:].reshape((-1, 4), order="C") ]);
+            if uvs is not None:
+                uvs = uvs.reshape((-1, 4, 2), order="C");
+                uvs = np.vstack([
+                    uvs[:,[0,1,2],:].reshape((-1, 2), order="C"),
+                    uvs[:,[0,2,3],:].reshape((-1, 2), order="C") ]);
         vertices = vertices[faces.ravel(order="C")];
         assert(len(colors) == len(vertices));
         faces = np.arange(len(vertices), dtype=int).reshape(
                 (num_faces, vertex_per_face), order="C");
 
         mesh = pymesh.form_mesh(vertices, faces);
-
-        if self.with_texture_coordinates:
-            uvs = active_view.texture_coordinates;
-        else:
-            uvs = None;
 
         data = serialize_mesh(mesh, None, colors, uvs);
         with open(tmp_mesh_name, 'wb') as fout:
