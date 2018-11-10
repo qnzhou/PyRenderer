@@ -180,7 +180,7 @@ class MitsubaRenderer(AbstractRenderer):
             view_transform = parent_transform * view_transform;
         glob_transform = self.__get_glob_transform();
 
-        total_transform = glob_transform * view_transform * normalize_transform;
+        total_transform = glob_transform * normalize_transform * view_transform;
         material_setting = self.__get_material_setting(active_view);
         setting = {
                 "type": ext[1:],
