@@ -192,7 +192,7 @@ class MitsubaRenderer(AbstractRenderer):
         target_shape = self.plgr.create(setting);
         self.mitsuba_scene.addChild(target_shape);
 
-        M = (glob_transform * view_transform * normalize_transform).getMatrix();
+        M = (glob_transform * normalize_transform * view_transform).getMatrix();
         M = np.array([
             [   M[0, 0],
                 M[0, 1],
