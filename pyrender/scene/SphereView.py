@@ -15,6 +15,7 @@ class SphereView(ViewDecorator):
             "scalar": scalar_field,
             "color_map": color_map,
             "radius_range": [min_radius, max_radius],
+            "bounds": [min_val, max_val], # use None if not needed
             "view": {
                 ...
             }
@@ -24,6 +25,7 @@ class SphereView(ViewDecorator):
         instance = SphereView(nested_view, setting["scalar"]);
         instance.color_map = setting.get("color_map", "jet");
         instance.radius_range = setting["radius_range"];
+        instance.bounds = setting.get("bounds", [None, None]);
         instance.generate_primitives();
         return instance;
 
@@ -45,8 +47,8 @@ class SphereView(ViewDecorator):
             color[:,:,-1] = 0.0;
         self.vertex_colors = color;
 
-        min_val = np.amin(self.scalar_field);
-        max_val = np.amax(self.scalar_field);
+        min_val = np.amin(self.scalar_field) if self.bounds[0] is None else self.bounds[0];
+        max_val = np.amax(self.scalar_field) if self.bounds[1] is None else self.bounds[1];
         radius_gap = self.radius_range[1] - self.radius_range[0];
         value_gap = max_val - min_val;
         for value, base in zip(self.scalar_field, self.base_points):
