@@ -51,23 +51,10 @@ class TextureView(ViewDecorator):
             assert(self.boundary_color in color_table);
             color = color_table[self.boundary_color];
 
-        vertices = self.mesh.vertices;
-        faces = self.mesh.faces;
-        uv = self.texture_coordinates;
-        num_faces, vertex_per_face = faces.shape;
-        assert(len(uv) == num_faces * vertex_per_face);
-
-        uv_faces = np.arange(len(uv), dtype=int).reshape((-1, vertex_per_face));
-        mesh = pymesh.form_mesh(uv, uv_faces);
-        mesh, info = pymesh.remove_duplicated_vertices(mesh);
-        index_map = info["index_map"];
-        input_vertex_index = faces.ravel();
-        output_vertex_index = np.ones(mesh.num_vertices, dtype=int) * -1;
-        output_vertex_index[index_map] = input_vertex_index;
-        assert(np.all(output_vertex_index >= 0));
-
         radius = self.boundary_radius / self.scale;
-        bd_edges = output_vertex_index[mesh.boundary_edges];
+        cutted_mesh = pymesh.cut_mesh(self.mesh);
+        bd_edges = cutted_mesh.boundary_edges;
+        vertices = cutted_mesh.vertices;
         for e in bd_edges:
             v0 = vertices[e[0]];
             v1 = vertices[e[1]];
