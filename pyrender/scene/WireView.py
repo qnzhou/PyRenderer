@@ -69,7 +69,7 @@ class WireView(View):
             self.primitives.append(ball);
 
         for e,l in zip(edges, lengths):
-            if l <= 0.0: continue;
+            if l <= 0.1 * self.radius : continue;
             cylinder = Cylinder(vertices[e[0]], vertices[e[1]], self.radius);
             cylinder.color = self.color;
             self.primitives.append(cylinder);
