@@ -67,7 +67,7 @@ class MeshView(View):
         """ Return corner field.  One vector per face corner.
         """
         normals = self.mesh.get_vertex_attribute("vertex_normal");
-        return normals[self.mesh.faces];
+        return normals[self.mesh.faces.ravel(order="C")];
 
     @property
     def face_normals(self):

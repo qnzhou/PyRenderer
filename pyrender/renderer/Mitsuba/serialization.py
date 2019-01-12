@@ -22,6 +22,9 @@ def serialize_mesh(mesh, normals=None, colors=None, uvs=None):
         normal_data = b''.join([struct.pack('<ddd', n[0], n[1], n[2])
             for n in normals]);
     else:
+        print("no normal");
+        print(mesh.num_vertices)
+        print(normals.shape);
         normal_data = b'';
 
     if colors is not None and len(colors) == mesh.num_vertices:

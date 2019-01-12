@@ -185,7 +185,7 @@ class MitsubaRenderer(AbstractRenderer):
         setting = {
                 "type": ext[1:],
                 "filename": mesh_file,
-                "faceNormals": True,
+                "faceNormals": False,
                 "toWorld": total_transform
                 }
         setting.update(material_setting);
@@ -564,7 +564,7 @@ class MitsubaRenderer(AbstractRenderer):
 
         mesh = pymesh.form_mesh(vertices, faces);
 
-        data = serialize_mesh(mesh, None, colors, uvs);
+        data = serialize_mesh(mesh, active_view.vertex_normals, colors, uvs);
         with open(tmp_mesh_name, 'wb') as fout:
             fout.write(data);
         return tmp_mesh_name, ext;
