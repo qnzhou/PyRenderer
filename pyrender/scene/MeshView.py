@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
+import math
 from pyrender.color.Color import color_table, Color
 from pyrender.color.ColorMap import ColorMap
 import pymesh
@@ -16,6 +17,7 @@ class MeshView(View):
             "color": color_name,
             "wire_frame": bool,
             "line_width": float, # default to 0.001
+            "smooth_normal": bool,
             "bbox": [[min_x, min_y, min_z], [max_x, max_y, max_z]]
         }
         """
@@ -24,6 +26,7 @@ class MeshView(View):
         instance.color_name = setting.get("color", None);
         instance.with_wire_frame = setting.get("wire_frame", False);
         instance.line_width = setting.get("line_width", instance.line_width);
+        instance.smooth_normal = setting.get("smooth_normal", False);
         if "bbox" in setting:
             instance.bmin = np.array(setting["bbox"][0]);
             instance.bmax = np.array(setting["bbox"][1]);
@@ -36,8 +39,10 @@ class MeshView(View):
         self.__init_mesh();
 
     def __init_mesh(self):
-        self.mesh.add_attribute("vertex_normal");
-        self.mesh.add_attribute("face_normal");
+        if not self.mesh.has_attribute("vertex_normal"):
+            self.mesh.add_attribute("vertex_normal");
+        if not self.mesh.has_attribute("face_normal"):
+            self.mesh.add_attribute("face_normal");
         if self.mesh.num_vertices > 0:
             bmin, bmax = self.mesh.bbox;
             self.bmin = bmin;
@@ -67,7 +72,7 @@ class MeshView(View):
         """ Return corner field.  One vector per face corner.
         """
         normals = self.mesh.get_vertex_attribute("vertex_normal");
-        return normals[self.mesh.faces];
+        return normals[self.mesh.faces.ravel(order="C")];
 
     @property
     def face_normals(self):
@@ -75,6 +80,10 @@ class MeshView(View):
         """
         normals = self.mesh.get_face_attribute("face_normal");
         return np.repeat(normals, self.mesh.vertex_per_face, axis=0);
+
+    @property
+    def use_smooth_normal(self):
+        return self.smooth_normal;
 
     @property
     def vertex_colors(self):

@@ -83,7 +83,7 @@ class View(object):
         self.alpha = 1.0;
         self.primitives = [];
         self.subviews = [];
-        self.line_width = 0.001;
+        self.line_width = 0.0015;
 
     def __validate_transform_field(self):
         if len(self.transform) != 12:
@@ -107,6 +107,10 @@ class View(object):
 
     @property
     def face_normals(self):
+        raise NotImplementedError("Calling abstract method");
+
+    @property
+    def use_smooth_normal(self):
         raise NotImplementedError("Calling abstract method");
 
     @property
