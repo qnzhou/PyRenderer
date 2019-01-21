@@ -70,7 +70,7 @@ def parse_arguments():
     parser.add_argument("-S", "--scene", "-S", help="scene file");
     parser.add_argument("--output", "-o", help="output directory", default=None);
     parser.add_argument("--renderer", choices=["opengl", "povray", "mitsuba"],
-            default="povray");
+            default="mitsuba");
     parser.add_argument("--with-quarter", "-q", help="draw reference quarters",
             action="store_true");
     parser.add_argument("--with-axis", help="draw reference axis",

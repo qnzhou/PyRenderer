@@ -333,15 +333,7 @@ class MitsubaRenderer(AbstractRenderer):
 
     def __get_material_setting(self, active_view):
         setting = {};
-        if self.with_wire_frame:
-            diffuse_color = {
-                    "type": "wireframe",
-                    "edgeColor": Spectrum(0.0),
-                    "lineWidth": active_view.line_width,
-                    "interiorColor":
-                        Spectrum(active_view.vertex_colors[0][0].tolist()[0:3]),
-                    };
-        elif self.with_texture_coordinates:
+        if self.with_texture_coordinates:
             diffuse_color = {
                     "type": "checkerboard",
                     "color0": Spectrum([1.0, 1.0, 1.0]),
@@ -372,7 +364,6 @@ class MitsubaRenderer(AbstractRenderer):
                     };
         if not self.with_colors and \
                 not self.with_alpha and \
-                not self.with_wire_frame and \
                 not self.with_texture_coordinates:
             setting["subsurface"] = {
                     "type": "dipole",

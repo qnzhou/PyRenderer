@@ -3,6 +3,7 @@ from numpy.linalg import norm
 import math
 from pyrender.color.Color import color_table, Color
 from pyrender.color.ColorMap import ColorMap
+from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 import pymesh
 import random
 from .View import View
@@ -16,7 +17,7 @@ class MeshView(View):
             "mesh": mesh_file,
             "color": color_name,
             "wire_frame": bool,
-            "line_width": float, # default to 0.001
+            "line_width": float, # default to 0.1
             "smooth_normal": bool,
             "bbox": [[min_x, min_y, min_z], [max_x, max_y, max_z]]
         }
@@ -24,13 +25,13 @@ class MeshView(View):
         mesh_file = setting["mesh"];
         instance = MeshView(mesh_file);
         instance.color_name = setting.get("color", None);
-        instance.with_wire_frame = setting.get("wire_frame", False);
         instance.line_width = setting.get("line_width", instance.line_width);
         instance.smooth_normal = setting.get("smooth_normal", False);
         if "bbox" in setting:
             instance.bmin = np.array(setting["bbox"][0]);
             instance.bmax = np.array(setting["bbox"][1]);
         instance.fit_into_unit_sphere();
+        instance.with_wire_frame = setting.get("wire_frame", False);
         return instance;
 
     def __init__(self, mesh_file):
@@ -54,6 +55,28 @@ class MeshView(View):
     def fit_into_unit_sphere(self, diagonal_len=2.0):
         self.center = (self.bmin + self.bmax) * 0.5;
         self.scale = diagonal_len / norm(self.bmax - self.bmin);
+
+    def generate_primitives(self):
+        if self.mesh.num_faces <= 0:
+            return;
+
+        self.primitives = [];
+        d = norm(self.bmax - self.bmin) / math.sqrt(self.mesh.dim);
+        radius = d * self.line_width;
+        assert(radius > 0);
+        vertices, edges = pymesh.mesh_to_graph(self.mesh);
+        lengths = norm(vertices[edges[:,0],:] - vertices[edges[:,1],:], axis=1);
+        color = color_table["dark_gray"];
+        for v in vertices:
+            ball = Sphere(v, radius);
+            ball.color = color;
+            self.primitives.append(ball);
+
+        for e,l in zip(edges, lengths):
+            if l <= 0.5 * radius : continue;
+            cylinder = Cylinder(vertices[e[0]], vertices[e[1]], radius);
+            cylinder.color = color;
+            self.primitives.append(cylinder);
 
     @property
     def vertices(self):
@@ -117,6 +140,8 @@ class MeshView(View):
     @with_wire_frame.setter
     def with_wire_frame(self, val):
         self.__with_wire_frame = val;
+        if val:
+            self.generate_primitives();
 
     @property
     def with_alpha(self):
