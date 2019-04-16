@@ -1,4 +1,4 @@
-FROM pymesh/pymesh
+FROM pymesh/pymesh:py3.5-slim
 WORKDIR /root/
 
 RUN apt-get update && apt-get install -y gcc-6 g++ scons libboost-all-dev libxerces-c-dev libeigen3-dev \
