@@ -121,8 +121,8 @@ def main():
 
     if args.output is not None:
         scene.output_dir = args.output;
-    if not os.path.exists(args.output):
-        os.makedirs(args.output);
+        if not os.path.exists(args.output):
+            os.makedirs(args.output);
     for i in range(len(scene.views)):
         scene.activate_view(i);
         assert(scene.active_view == scene.views[i]);
