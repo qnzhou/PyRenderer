@@ -120,6 +120,7 @@ class ClippedView(ViewDecorator):
             self.V_to_keep = [should_keep(v) for v in centroids];
             faces = self.view.faces[self.V_to_keep];
             self.mesh = pymesh.form_mesh(self.view.vertices, faces);
+            self.vertex_colors = self.vertex_colors[self.V_to_keep];
 
         self.mesh.add_attribute("face_normal");
 
