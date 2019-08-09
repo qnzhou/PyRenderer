@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
-from pyrender.color.Color import color_table, Color
+from pyrender.color.Color import get_color, Color
 from pyrender.color.ColorMap import ColorMap
 from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 import pymesh
@@ -51,13 +51,12 @@ class WireView(View):
 
     def generate_primitives(self):
         if self.color_name is None:
-            self.color = color_table["nylon_white"];
+            self.color = get_color("nylon_white");
         elif self.color_name == "random":
             self.color = ColorMap("RdYlBu").get_color(
                     random.choice([0.1, 0.3, 0.5, 0.7, 0.9]));
         else:
-            assert(self.color_name in color_table);
-            self.color = color_table[self.color_name];
+            self.color = get_color(self.color_name);
 
         self.wires.add_attribute("edge_length");
         vertices = self.wires.vertices;

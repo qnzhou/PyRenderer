@@ -2,7 +2,7 @@ import numpy as np
 import numpy.linalg
 import pymesh
 
-from pyrender.color.Color import color_table, Color
+from pyrender.color.Color import get_color, Color
 from pyrender.color.ColorMap import ColorMap
 from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 
@@ -43,13 +43,12 @@ class TextureView(ViewDecorator):
 
     def extract_texture_boundary(self):
         if self.boundary_color is None:
-            color = color_table["black"];
+            color = get_color("black");
         elif self.boundary_color == "random":
             color = ColorMap("RdYlBu").get_color(
                     random.choice([0.1, 0.3, 0.5, 0.7, 0.9]));
         else:
-            assert(self.boundary_color in color_table);
-            color = color_table[self.boundary_color];
+            color = get_color(self.boundary_color);
 
         radius = self.boundary_radius / self.scale;
         cutted_mesh = pymesh.cut_mesh(self.mesh);

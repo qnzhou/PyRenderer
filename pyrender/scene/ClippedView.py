@@ -8,7 +8,7 @@ import os.path
 from .View import View
 from .ViewDecorator import ViewDecorator
 from .MeshView import MeshView
-from pyrender.color.Color import color_table, Color
+from pyrender.color.Color import get_color, Color
 
 class ClippedView(ViewDecorator):
     @classmethod
@@ -74,7 +74,7 @@ class ClippedView(ViewDecorator):
 
             old_vertex_colors = self.vertex_colors;
             new_vertex_colors = np.zeros((self.mesh.num_faces, 3, 4));
-            cut_color = color_table[interior_color];
+            cut_color = get_color(interior_color);
             cut_color = np.array([cut_color.red, cut_color.green,
                 cut_color.blue, cut_color.alpha]);
             is_interface = np.zeros(self.mesh.num_faces, dtype=bool);

@@ -81,3 +81,22 @@ color_table = {
         }
 
 
+def get_color(value):
+    """ Convert value to a Color object.
+
+    Value can be a color name, a hex string or [r, g, b] values.
+    """
+    if isinstance(value, basestring):
+        if value in color_table:
+            return color_table[value];
+        else:
+            # Assuming hex.
+            return Color.from_hex(value);
+    else:
+        # Assuming rgb
+        assert(len(value) >= 3);
+        assert(isinstance(value[0], int));
+        assert(isinstance(value[1], int));
+        assert(isinstance(value[2], int));
+        return Color(value[0]/255.0, value[1]/255.0, value[2]/255.0);
+

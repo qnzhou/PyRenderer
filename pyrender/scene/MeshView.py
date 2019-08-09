@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 import math
-from pyrender.color.Color import color_table, Color
+from pyrender.color.Color import get_color, Color
 from pyrender.color.ColorMap import ColorMap
 from pyrender.primitives.Primitive import Cylinder, Cone, Sphere
 import pymesh
@@ -68,7 +68,7 @@ class MeshView(View):
         assert(radius > 0);
         vertices, edges = pymesh.mesh_to_graph(self.mesh);
         lengths = norm(vertices[edges[:,0],:] - vertices[edges[:,1],:], axis=1);
-        color = color_table[self.line_color];
+        color = get_color(self.line_color);
         for v in vertices:
             ball = Sphere(v, radius);
             ball.color = color;
@@ -118,9 +118,9 @@ class MeshView(View):
             c = ColorMap("RdYlBu").get_color(
                     random.choice([0.1, 0.3, 0.5, 0.7, 0.9]));
         elif self.color_name is not None:
-            c = color_table[self.color_name];
+            c = get_color(self.color_name);
         else:
-            c = color_table["nylon_white"];
+            c = get_color("nylon_white");
 
         c.color[-1] = self.alpha;
         colors = np.array([[c.color] * self.mesh.vertex_per_face] *
