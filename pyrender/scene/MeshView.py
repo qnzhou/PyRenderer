@@ -17,6 +17,7 @@ class MeshView(View):
             "mesh": mesh_file,
             "color": color_name,
             "wire_frame": bool,
+            "line_color": color_name,
             "line_width": float, # default to 0.1
             "smooth_normal": bool,
             "bbox": [[min_x, min_y, min_z], [max_x, max_y, max_z]]
@@ -26,6 +27,7 @@ class MeshView(View):
         instance = MeshView(mesh_file);
         instance.color_name = setting.get("color", None);
         instance.line_width = setting.get("line_width", instance.line_width);
+        instance.line_color = setting.get("line_color", "dark_gray");
         instance.smooth_normal = setting.get("smooth_normal", False);
         if "bbox" in setting:
             instance.bmin = np.array(setting["bbox"][0]);
@@ -66,7 +68,7 @@ class MeshView(View):
         assert(radius > 0);
         vertices, edges = pymesh.mesh_to_graph(self.mesh);
         lengths = norm(vertices[edges[:,0],:] - vertices[edges[:,1],:], axis=1);
-        color = color_table["dark_gray"];
+        color = color_table[self.line_color];
         for v in vertices:
             ball = Sphere(v, radius);
             ball.color = color;
