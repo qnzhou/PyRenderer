@@ -90,6 +90,8 @@ class ClippedView(ViewDecorator):
                     self.mesh.faces[is_interface]);
             self.boundary = pymesh.form_mesh(self.mesh.vertices,
                     self.mesh.faces[np.logical_not(is_interface)]);
+            self.interface, __ = pymesh.remove_isolated_vertices(self.interface);
+            self.boundary, __ = pymesh.remove_isolated_vertices(self.boundary);
             #self.vertex_colors = new_vertex_colors[is_interface];
             tmp_dir = tempfile.gettempdir();
             m = hashlib.md5();
