@@ -106,14 +106,18 @@ class ClippedView(ViewDecorator):
                         "type": "mesh_only",
                         "mesh": bd_mesh_file,
                         "color": exterior_color,
-                        "wire_frame": True,
+                        "wire_frame": nested_view.with_wire_frame,
+                        "line_width": nested_view.line_width,
+                        "line_color": nested_view.line_color,
                         "bbox": [self.bmin, self.bmax]
                         }),
                     MeshView.create_from_setting({
                         "type": "mesh_only",
                         "mesh": interface_mesh_file,
                         "color": interior_color,
-                        "wire_frame": True,
+                        "wire_frame": nested_view.with_wire_frame,
+                        "line_width": nested_view.line_width,
+                        "line_color": nested_view.line_color,
                         "bbox": [self.bmin, self.bmax]
                         }),
                     ];

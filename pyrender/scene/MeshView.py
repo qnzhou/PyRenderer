@@ -27,7 +27,7 @@ class MeshView(View):
         instance = MeshView(mesh_file);
         instance.color_name = setting.get("color", None);
         instance.line_width = setting.get("line_width", instance.line_width);
-        instance.line_color = setting.get("line_color", "dark_gray");
+        instance.line_color = setting.get("line_color", "black");
         instance.smooth_normal = setting.get("smooth_normal", False);
         if "bbox" in setting:
             instance.bmin = np.array(setting["bbox"][0]);

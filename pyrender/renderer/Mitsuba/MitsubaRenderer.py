@@ -252,8 +252,8 @@ class MitsubaRenderer(AbstractRenderer):
         for shape in primitives:
             if shape.color[3] <= 0.0: continue;
             color = {
-                    "type": "plastic",
-                    "diffuseReflectance": Spectrum(shape.color[:3].tolist())
+                    "type": "diffuse",
+                    "reflectance": Spectrum(shape.color[:3].tolist())
                     };
             if shape.color[3] < 1.0:
                 color = {
