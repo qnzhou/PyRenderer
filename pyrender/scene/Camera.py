@@ -18,6 +18,7 @@ class Camera(object):
         instance.near_plane = setting.get("near_plane", instance.near_plane);
         instance.far_plane = setting.get("far_plane", instance.far_plane);
         instance.crop_bbox = setting.get("crop_bbox", instance.crop_bbox);
+        instance.sample_count = setting.get("sample_count", instance.sample_count);
         instance.update();
         return instance;
 
@@ -34,6 +35,7 @@ class Camera(object):
         self.near_plane = 0.01
         self.far_plane = 1000000.0;
         self.crop_bbox = [[0.0, 0.0], [1.0, 1.0]];
+        self.sample_count = 4;
         self.update();
 
     def update(self):

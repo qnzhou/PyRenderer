@@ -81,33 +81,39 @@ class MitsubaRenderer(AbstractRenderer):
         self.mitsuba_scene.addChild(integrator);
 
     def __add_lights(self):
-        #TODO: load lights from scene
-        front_light = self.plgr.create({
-            "type": "sphere",
-            "center": Point(3.0, 6.0, 4.0),
-            "radius": 2.5,
-            "emitter": {
-                "type": "area",
-                "radiance": Spectrum(10.0),
-                "samplingWeight": 10.0
-                }
-            });
+        for light in self.scene.lights:
+            x, y, z = light.location
+            args = {
+                "type": light.type,
+            }
+            if light.type == "point":
+                args.update({
+                    "position": Point(x, y, z),
+                    "intensity": Spectrum(light.intensity)
+                })
+            elif light.type == "sphere":
+                args.update({
+                    "center": Point(x, y, z),
+                    "radius": light.radius,
+                    "emitter": {
+                        "type": "area",
+                        "radiance": Spectrum(light.intensity),
+                        "samplingWeight": light.sampling_weight
+                    }
+                })
+            elif light.type == "constant":
+                args.update({
+                    "radiance": Spectrum(light.intensity),
+                    "samplingWeight": light.sampling_weight
+                })
+            elif light.type == "envmap":
+                args.update({
+                    "filename": light.filename,
+                    "samplingWeight": light.sampling_weight,
+                    "scale": light.scale
+                })
 
-        side_light = self.plgr.create({
-            "type": "point",
-            "position": Point(4.0, 4.0, -1.0),
-            "intensity": Spectrum(5.0)
-            });
-
-        back_light = self.plgr.create({
-            "type": "point",
-            "position": Point(-0, 5.0, -1),
-            "intensity": Spectrum(5.0)
-            });
-
-        self.mitsuba_scene.addChild(front_light);
-        #self.mitsuba_scene.addChild(side_light);
-        #self.mitsuba_scene.addChild(back_light);
+            self.mitsuba_scene.addChild(self.plgr.create(args))
 
     def __add_active_camera(self):
         active_view = self.scene.active_view;
@@ -151,7 +157,7 @@ class MitsubaRenderer(AbstractRenderer):
                 },
             "sampler": {
                 "type": "halton",
-                "sampleCount": 4,
+                "sampleCount": camera.sample_count,
                 }
             });
         self.mitsuba_scene.addChild(mitsuba_camera);
