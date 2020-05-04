@@ -127,6 +127,7 @@ class Scene(object):
         self.activate_camera();
 
     def __initialize_lights(self, setting):
+        setting = self.__remove_relative_lights_path(setting);
         light_configs = setting.get("lights");
         self.lights = [Light.create_from_setting(light_setting)
                 for light_setting in light_configs];
@@ -144,6 +145,30 @@ class Scene(object):
                 self.views.append(view);
         self.activate_view();
         self.__compute_global_transform();
+
+    def __remove_relative_lights_path(self, setting):
+        if not hasattr(self, "scene_file"):
+            return setting;
+
+        scene_file_dir = os.path.dirname(self.scene_file);
+
+        def remove_rel_path(config):
+            if isinstance(config, list):
+                return [remove_rel_path(val) for val in config]
+            elif isinstance(config, dict):
+                for key,val in config.items():
+                    if key == "filename":
+                        envmap_file = val;
+                        if envmap_file is not None and (not os.path.isabs(envmap_file)):
+                            config[key] = os.path.join(scene_file_dir, envmap_file);
+                    else:
+                        val = remove_rel_path(val);
+                        config[key] = val;
+                return config
+            else:
+                return config;
+
+        return remove_rel_path(setting);
 
     def __remove_relative_mesh_path(self, setting):
         if not hasattr(self, "scene_file"):
